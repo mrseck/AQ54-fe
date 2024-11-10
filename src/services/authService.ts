@@ -24,8 +24,6 @@
       username: string;
       email: string;
       password: string;
-      firstName: string;
-      lastName: string;
     }): Promise<AuthResponse> {
       const response = await fetch(`${API_URL}/register`, {
         method: 'POST',
