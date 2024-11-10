@@ -1,35 +1,91 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  Outlet
+} from "react-router-dom";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import Layout from "@/components/Layouts/MainLayout";
+import AuthForms from "@/components/AuthForms";
+import UserDashboard from "@/pages/UserDashboard";
+import AdminDashboard from "@/pages/AdminDashboard";
 
-function App() {
-  const [count, setCount] = useState(0)
+// Composant de redirection basé sur le rôle
+const RoleBasedRedirect = () => {
+  const { isAuthenticated, user, loading } = useAuth();
 
+  if (loading) {
+    return <div>Chargement...</div>;
+  }
+
+  if (isAuthenticated) {
+    if (user?.role === "ADMIN") {
+      return <Navigate to="/admin" replace />;
+    }
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return <AuthForms />;
+};
+
+// Composant de protection des routes avec vérification des rôles
+const ProtectedRoute = ({ allowedRoles }: { allowedRoles: string[] }) => {
+  const { isAuthenticated, user, loading } = useAuth();
+
+  if (loading) {
+    return <div>Chargement...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (user && !allowedRoles.includes(user.role)) {
+    // Rediriger vers la page appropriée en fonction du rôle
+    if (user.role === "ADMIN") {
+      return <Navigate to="/admin" replace />;
+    }
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <Outlet />;
+};
+
+// Configuration des routes de l'application
+const AppRoutes = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Router>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          {/* Route publique */}
+          <Route index element={<RoleBasedRedirect />} />
 
-export default App
+          {/* Routes protégées pour les utilisateurs */}
+          <Route element={<ProtectedRoute allowedRoles={["USER"]} />}>
+            <Route path="dashboard" element={<UserDashboard />} />
+          </Route>
+
+          {/* Routes protégées pour les admins */}
+          <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
+            <Route path="admin" element={<AdminDashboard />} />
+          </Route>
+
+          {/* Redirection des routes inconnues */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </Router>
+  );
+};
+
+// Composant principal de l'application
+const App = () => {
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
+  );
+};
+
+export default App;
