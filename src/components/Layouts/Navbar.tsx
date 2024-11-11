@@ -4,7 +4,6 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const { isAuthenticated, user, logout } = useAuth();
-
   return (
     <nav className="bg-white shadow">
       <div className="container mx-auto px-4">
@@ -12,7 +11,6 @@ const Navbar = () => {
           <Link to="/" className="font-bold text-xl">
             AQ54 Manager
           </Link>
-
           <div className="flex gap-4 items-center">
             {isAuthenticated ? (
               <>
@@ -20,9 +18,14 @@ const Navbar = () => {
                   Bienvenue, {user?.username}
                 </span>
                 {user?.role === "ADMIN" && (
-                  <Button variant="ghost" asChild>
-                    <Link to="/admin">Dashboard Admin</Link>
-                  </Button>
+                  <>
+                    <Button variant="ghost" asChild>
+                      <Link to="/admin">Dashboard Admin</Link>
+                    </Button>
+                    <Button variant="ghost" asChild>
+                      <Link to="/create-user">Créer Utilisateur</Link>
+                    </Button>
+                  </>
                 )}
                 {user?.role === "USER" && (
                   <Button variant="ghost" asChild>

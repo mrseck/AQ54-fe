@@ -10,6 +10,7 @@ import Layout from "@/components/Layouts/MainLayout";
 import AuthForms from "@/components/AuthForms";
 import UserDashboard from "@/pages/UserDashboard";
 import AdminDashboard from "@/pages/AdminDashboard";
+import CreateUser from "./pages/CreateUser";
 
 // Composant de redirection basé sur le rôle
 const RoleBasedRedirect = () => {
@@ -69,6 +70,7 @@ const AppRoutes = () => {
           {/* Routes protégées pour les admins */}
           <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
             <Route path="admin" element={<AdminDashboard />} />
+            <Route path="/create-user" element={<CreateUser />} />
           </Route>
 
           {/* Redirection des routes inconnues */}
