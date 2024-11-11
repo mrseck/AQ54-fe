@@ -1,138 +1,173 @@
+import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { useAuth } from '../contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Upload } from 'lucide-react';
-import { useState, ChangeEvent, useEffect } from 'react';
+import { useEffect } from 'react';
+import SensorDashboard from './SensorDashboard';
+import { BarChart, Activity, Users, AlertCircle, LucideIcon } from 'lucide-react';
 
-interface FileState {
-  name: string;
-  type: string;
-  size: number;
+// Définition des interfaces
+interface Trend {
+  value: string;
+  positive: boolean;
 }
 
-const AdminDashboard = () => {
-  const auth = useAuth(); // Stockez le résultat dans une variable
-  const [selectedFile, setSelectedFile] = useState<FileState | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+interface StatCardProps {
+  title: string;
+  value: string;
+  icon: LucideIcon;
+  trend?: Trend;
+}
 
-  // Si vous avez besoin d'effectuer des actions basées sur l'auth
+const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, trend }) => (
+  <Card>
+    <CardContent className="pt-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-gray-500">{title}</p>
+          <h3 className="text-2xl font-bold mt-2">{value}</h3>
+          {trend && (
+            <p className={`text-sm mt-2 ${trend.positive ? 'text-green-600' : 'text-red-600'}`}>
+              {trend.value}
+            </p>
+          )}
+        </div>
+        <div className="p-4 bg-gray-100 rounded-full">
+          <Icon className="w-6 h-6 text-gray-600" />
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+);
+
+interface MetricData {
+  name: string;
+  percentage: number;
+}
+
+const AdminDashboard: React.FC = () => {
+  const auth = useAuth();
+
   useEffect(() => {
-    // Placez ici la logique qui dépend de l'auth
-    // Par exemple, charger les données initiales
-  }, [auth]); // Utilisez auth comme dépendance
+    // Logique d'initialisation
+  }, [auth]);
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && file.type === 'application/pdf') {
-      setSelectedFile({
-        name: file.name,
-        type: file.type,
-        size: file.size
-      });
-    } else {
-      alert('Veuillez sélectionner un fichier PDF');
-      event.target.value = '';
-    }
-  };
+  const metrics: MetricData[] = [
+    { name: 'CPU', percentage: 85 },
+    { name: 'Mémoire', percentage: 85 },
+    { name: 'Stockage', percentage: 85 },
+    { name: 'Réseau', percentage: 85 }
+  ];
 
-  const handleSubmit = async () => {
-    if (!selectedFile) {
-      alert('Veuillez sélectionner un fichier PDF');
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      // Simuler un envoi de fichier
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('Fichier envoyé:', selectedFile);
-      // Réinitialiser le formulaire après succès
-      setSelectedFile(null);
-      if (document.querySelector('input[type="file"]')) {
-        (document.querySelector('input[type="file"]') as HTMLInputElement).value = '';
-      }
-    } catch (error) {
-      console.error('Erreur lors de l\'envoi:', error);
-      alert('Une erreur est survenue lors de l\'envoi du fichier');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const quickActions: string[] = ['Vérifier Système', 'Mise à jour', 'Sauvegarder', 'Configuration'];
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Administration</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
+    <div className="p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Tableau de Bord Administration</h1>
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full">
+            <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
+            Système actif
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard 
+          title="Capteurs Actifs" 
+          value="24" 
+          icon={Activity}
+          trend={{ value: "+2 depuis hier", positive: true }}
+        />
+        <StatCard 
+          title="Utilisateurs" 
+          value="156" 
+          icon={Users}
+          trend={{ value: "+12 ce mois", positive: true }}
+        />
+        <StatCard 
+          title="Alertes" 
+          value="3" 
+          icon={AlertCircle}
+          trend={{ value: "-2 depuis hier", positive: true }}
+        />
+        <StatCard 
+          title="Données Collectées" 
+          value="1.2M" 
+          icon={BarChart}
+          trend={{ value: "+12.3% ce mois", positive: true }}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Statistiques Utilisateurs</CardTitle>
+            <CardTitle>Données des Capteurs</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              <p className="text-2xl font-bold">0</p>
-              <p className="text-gray-600">Utilisateurs inscrits</p>
-            </div>
+            <SensorDashboard />
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Activité du site</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <p className="text-2xl font-bold">0</p>
-              <p className="text-gray-600">Connexions aujourd'hui</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>État du système</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <p className="text-green-500 font-semibold">Opérationnel</p>
-              <p className="text-gray-600">Tous les services sont actifs</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Upload de Document</CardTitle>
+            <CardTitle>Alertes Récentes</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="file"
-                  accept=".pdf"
-                  onChange={handleFileChange}
-                  className="block w-full text-sm text-gray-500
-                    file:mr-4 file:py-2 file:px-4
-                    file:rounded-md file:border-0
-                    file:text-sm file:font-semibold
-                    file:bg-blue-50 file:text-blue-700
-                    hover:file:bg-blue-100"
-                  disabled={isLoading}
-                />
-              </div>
-              <Button 
-                onClick={handleSubmit}
-                className="w-full flex items-center justify-center"
-                disabled={!selectedFile || isLoading}
-              >
-                <Upload className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                {isLoading ? 'Envoi en cours...' : 'Envoyer le fichier'}
-              </Button>
-              {selectedFile && (
-                <p className="text-sm text-gray-600">
-                  Fichier sélectionné : {selectedFile.name}
-                </p>
-              )}
+              {[1, 2, 3].map((_, i) => (
+                <div key={i} className="flex items-start space-x-4 p-3 bg-gray-50 rounded-lg">
+                  <AlertCircle className="w-5 h-5 text-orange-500 mt-1" />
+                  <div>
+                    <p className="font-medium">Alerte Capteur #{i + 1}</p>
+                    <p className="text-sm text-gray-600">Il y a {i + 1}h</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>État du Système</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {metrics.map((metric) => (
+                <div key={metric.name} className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium">{metric.name}</span>
+                    <span className="text-sm text-gray-500">{metric.percentage}%</span>
+                  </div>
+                  <div className="h-2 bg-gray-100 rounded-full">
+                    <div 
+                      className="h-full bg-blue-500 rounded-full" 
+                      style={{ width: `${metric.percentage}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Actions Rapides</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              {quickActions.map((action) => (
+                <button
+                  key={action}
+                  className="p-4 text-left bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <p className="font-medium">{action}</p>
+                </button>
+              ))}
             </div>
           </CardContent>
         </Card>
