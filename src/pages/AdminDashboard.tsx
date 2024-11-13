@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { useAuth } from '../contexts/AuthContext';
-import { useEffect } from 'react';
 import SensorDashboard from './SensorDashboard';
 import { BarChart, Activity, Users, AlertCircle, LucideIcon } from 'lucide-react';
 
@@ -46,10 +45,56 @@ interface MetricData {
 
 const AdminDashboard: React.FC = () => {
   const auth = useAuth();
+  const [userCount, setUserCount] = useState<number | null>(null);
+  const [dataCount, setDataCount] = useState<number | null>(null);
+
+
+  // Fonction pour récupérer le nombre d’utilisateurs depuis l'API
+  const fetchUserCount = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch('http://localhost:3000/api/v1/auth/users', {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+          
+        },
+      });
+      const data = await response.json();
+      if (data && typeof data.count === 'number') {
+        setUserCount(data.count);
+      } else {
+        console.error("Format de données inattendu : ", data);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération du nombre d'utilisateurs :", error);
+    }
+  }, [auth.token]);
 
   useEffect(() => {
-    // Logique d'initialisation
-  }, [auth]);
+    fetchUserCount();
+  }, [fetchUserCount]);
+
+  const fetchSensorDataCount = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch('http://localhost:3000/api/v1/sensor/data-collected',{
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+          
+        },
+      });
+      const data = await response.json();
+      setDataCount(data.count);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des données du capteur :", error);
+    }
+  }, []);
+  
+  useEffect(() => {
+    fetchSensorDataCount();
+  }, [fetchSensorDataCount]);
 
   const metrics: MetricData[] = [
     { name: 'CPU', percentage: 85 },
@@ -64,12 +109,10 @@ const AdminDashboard: React.FC = () => {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Tableau de Bord Administration</h1>
-        <div className="flex items-center space-x-4">
-          
-        </div>
+        <div className="flex items-center space-x-4"></div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <StatCard 
           title="Capteurs Actifs" 
           value="2" 
@@ -77,21 +120,13 @@ const AdminDashboard: React.FC = () => {
         />
         <StatCard 
           title="Utilisateurs" 
-          value="156" 
+          value={userCount !== null ? userCount.toString() : "Chargement..."} 
           icon={Users}
-          trend={{ value: "+12 ce mois", positive: true }}
-        />
-        <StatCard 
-          title="Alertes" 
-          value="3" 
-          icon={AlertCircle}
-          trend={{ value: "-2 depuis hier", positive: true }}
         />
         <StatCard 
           title="Données Collectées" 
-          value="1.2M" 
+          value={dataCount !== null ? dataCount.toString() : "Chargement..."} 
           icon={BarChart}
-          trend={{ value: "+12.3% ce mois", positive: true }}
         />
       </div>
 
