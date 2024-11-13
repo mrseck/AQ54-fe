@@ -43,18 +43,18 @@ const AGGREGATION_PERIODS = [
 ] as const;
 type AggregationType = (typeof AGGREGATION_PERIODS)[number]["value"];
 
-const API_URL = 'http://localhost:3000/api/v1';
+const API_URL = "http://localhost:3000/api/v1";
 
 // Service API avec gestion du token
 const createAuthenticatedRequest = async (
   endpoint: string,
   options: RequestInit = {}
 ) => {
-  const token = localStorage.getItem('token'); // Récupère le token stocké
-  
+  const token = localStorage.getItem("token"); // Récupère le token stocké
+
   const headers = {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` }),
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
     ...options.headers,
   };
 
@@ -66,7 +66,7 @@ const createAuthenticatedRequest = async (
 
     if (response.status === 401) {
       // Rediriger vers la page de login ou déclencher un événement d'authentification
-      throw new Error('Session expirée');
+      throw new Error("Session expirée");
     }
 
     if (!response.ok) {
@@ -75,7 +75,7 @@ const createAuthenticatedRequest = async (
 
     return await response.json();
   } catch (error) {
-    console.error('API request failed:', error);
+    console.error("API request failed:", error);
     throw error;
   }
 };
@@ -87,12 +87,12 @@ const createAuthenticatedRequest = async (
  * @returns Date formatée au format ISO avec temps et timezone
  */
 const formatDateTimeForAPI = (date: string, time: string): string => {
-  if (!date) return '';
-  
+  if (!date) return "";
+
   // Combine la date et l'heure
-  const dateTimeString = `${date}T${time || '00:00'}:00`;
+  const dateTimeString = `${date}T${time || "00:00"}:00`;
   const dateObj = new Date(dateTimeString);
-  
+
   return dateObj.toISOString();
 };
 
@@ -142,7 +142,7 @@ const SensorDashboard: React.FC = () => {
         stationNames: selectedSensor,
         startDate: formattedStartDate,
         endDate: formattedEndDate,
-        granularity: aggregation
+        granularity: aggregation,
       }).toString();
 
       const result = await createAuthenticatedRequest(`/sensor?${queryParams}`);
@@ -161,8 +161,8 @@ const SensorDashboard: React.FC = () => {
       setData(formattedData);
     } catch (error) {
       console.error("Erreur détaillée:", error);
-      
-      if (error instanceof Error && error.message.includes('Session expirée')) {
+
+      if (error instanceof Error && error.message.includes("Session expirée")) {
         setError("Votre session a expiré. Veuillez vous reconnecter.");
         // Ici vous pouvez déclencher une redirection vers la page de login
       } else {
@@ -204,7 +204,9 @@ const SensorDashboard: React.FC = () => {
 
             <select
               value={aggregation}
-              onChange={(e) => setAggregation(e.target.value as AggregationType)}
+              onChange={(e) =>
+                setAggregation(e.target.value as AggregationType)
+              }
               className="border rounded-md p-2"
             >
               {AGGREGATION_PERIODS.map((period) => (
@@ -262,7 +264,7 @@ const SensorDashboard: React.FC = () => {
         </CardHeader>
       </Card>
 
-      <Card className="w-ful">
+      <Card className="w-full">
         <CardContent>
           {isLoading ? (
             <div className="text-center p-4">Chargement des données...</div>
