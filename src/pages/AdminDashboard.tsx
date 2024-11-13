@@ -65,19 +65,15 @@ const AdminDashboard: React.FC = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Tableau de Bord Administration</h1>
         <div className="flex items-center space-x-4">
-          <div className="flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full">
-            <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
-            Système actif
-          </div>
+          
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
           title="Capteurs Actifs" 
-          value="24" 
+          value="2" 
           icon={Activity}
-          trend={{ value: "+2 depuis hier", positive: true }}
         />
         <StatCard 
           title="Utilisateurs" 
