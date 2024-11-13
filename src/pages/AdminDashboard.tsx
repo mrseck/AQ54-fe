@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { useAuth } from '../contexts/AuthContext';
 import SensorDashboard from './SensorDashboard';
-import { BarChart, Activity, Users, AlertCircle, LucideIcon } from 'lucide-react';
+import { BarChart, Activity, Users, LucideIcon } from 'lucide-react';
 
 // Définition des interfaces
 interface Trend {
@@ -38,10 +38,6 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, trend }) 
   </Card>
 );
 
-interface MetricData {
-  name: string;
-  percentage: number;
-}
 
 const AdminDashboard: React.FC = () => {
   const auth = useAuth();
@@ -96,14 +92,7 @@ const AdminDashboard: React.FC = () => {
     fetchSensorDataCount();
   }, [fetchSensorDataCount]);
 
-  const metrics: MetricData[] = [
-    { name: 'CPU', percentage: 85 },
-    { name: 'Mémoire', percentage: 85 },
-    { name: 'Stockage', percentage: 85 },
-    { name: 'Réseau', percentage: 85 }
-  ];
 
-  const quickActions: string[] = ['Vérifier Système', 'Mise à jour', 'Sauvegarder', 'Configuration'];
 
   return (
     <div className="p-6 space-y-6">
@@ -131,78 +120,19 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2">
+        <Card className="col-span-1 lg:col-span-3">
           <CardHeader>
-            <CardTitle>Données des Capteurs</CardTitle>
+            <CardTitle></CardTitle>
           </CardHeader>
           <CardContent>
             <SensorDashboard />
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Alertes Récentes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[1, 2, 3].map((_, i) => (
-                <div key={i} className="flex items-start space-x-4 p-3 bg-gray-50 rounded-lg">
-                  <AlertCircle className="w-5 h-5 text-orange-500 mt-1" />
-                  <div>
-                    <p className="font-medium">Alerte Capteur #{i + 1}</p>
-                    <p className="text-sm text-gray-600">Il y a {i + 1}h</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+      
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>État du Système</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {metrics.map((metric) => (
-                <div key={metric.name} className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">{metric.name}</span>
-                    <span className="text-sm text-gray-500">{metric.percentage}%</span>
-                  </div>
-                  <div className="h-2 bg-gray-100 rounded-full">
-                    <div 
-                      className="h-full bg-blue-500 rounded-full" 
-                      style={{ width: `${metric.percentage}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Actions Rapides</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              {quickActions.map((action) => (
-                <button
-                  key={action}
-                  className="p-4 text-left bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <p className="font-medium">{action}</p>
-                </button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      
     </div>
   );
 };

@@ -187,7 +187,7 @@ const SensorDashboard: React.FC = () => {
       <Card className="w-full">
         <CardHeader>
           <div className="mb-4">
-            <h2 className="text-2xl font-bold">Dashboard Capteurs</h2>
+            <h2 className="text-2xl font-bold ">Données des Capteurs</h2>
           </div>
           <div className="flex flex-wrap gap-4">
             <select
@@ -262,7 +262,7 @@ const SensorDashboard: React.FC = () => {
         </CardHeader>
       </Card>
 
-      <Card className="w-full">
+      <Card className="w-ful">
         <CardContent>
           {isLoading ? (
             <div className="text-center p-4">Chargement des données...</div>
