@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { AuthResponse } from '../types/auth';
 
 const API_URL = 'http://localhost:3000/api/v1/auth';
@@ -17,7 +18,11 @@ export const authService = {
 
       if (!response.ok) {
         const errorData = await response.json();
+        if (response.status === 401) {
+          this.logout(); // Appel de la fonction pour rediriger en cas d'authentification échouée
+        }
         throw new Error(errorData.message || 'Échec de la connexion');
+      
       }
 
       const data = await response.json();
@@ -77,6 +82,12 @@ export const authService = {
       console.error('Erreur création utilisateur:', error);
       throw error;
     }
+  },
+
+  handleUnauthorized(navigate: ReturnType<typeof useNavigate>) {
+    console.warn('Token expiré ou non valide, redirection vers la page de connexion');
+    this.logout();
+    navigate('/'); 
   },
 
   getAuthorizationHeader() {
