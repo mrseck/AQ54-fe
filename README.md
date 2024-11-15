@@ -6,7 +6,11 @@ Il est déjà deployé et vous pouvez y accéder via l'url suivante: (http://srv
 
 ## deploiement complet du projet avec docker compose
 
-renommer le fichier compose.example.yml en compose.yml et lancer la commande
+renommer le fichier compose.example.yml en compose.yml 
+
+créer votre image à l'aide de la sexion III - Deployer avec docker
+
+puis renseignez le nom de votre image dans la partie image du dockeer compose
 
 NB: la base de donnée existe déja dans le fichier compose donc il s'uffit juste de créer le fichier d'environnement, rajouter les variables definie un peu plus bas et d'executer la commande ci-dessous.
 
